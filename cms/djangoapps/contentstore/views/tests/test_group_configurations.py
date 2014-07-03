@@ -1,6 +1,7 @@
 import json
 from contentstore.utils import reverse_course_url
 from contentstore.tests.utils import CourseTestCase
+from xmodule.partitions.partitions import UserPartition
 
 
 class GroupConfigurationsCreateTestCase(CourseTestCase):
@@ -170,3 +171,93 @@ class GroupConfigurationsCreateTestCase(CourseTestCase):
         )
         content = json.loads(second_response.content)
         self.assertEqual(content['id'], 2)
+
+
+class GroupConfigurationsEditTestCase(CourseTestCase):
+    """
+    Test cases for editing group configurations.
+    """
+
+    def setUp(self):
+        """
+        Set up a url and group configuration content for tests.
+        """
+        super(GroupConfigurationsEditTestCase, self).setUp()
+        self.post_url = reverse_course_url('group_configurations_list_handler', self.course.id)
+
+        self.group_configuration_json = {
+            u'description': u'Test description',
+            u'name': u'Test name'
+        }
+
+        group_configuration = {
+            u'description': u'Test description',
+            u'id': 1,
+            u'name': u'Test name',
+            u'version': 1,
+            u'groups': [
+                {u'id': 0, u'name': u'Group A', u'version': 1},
+                {u'id': 1, u'name': u'Group B', u'version': 1}
+            ]
+        }
+        self.course.user_partitions = [UserPartition.from_json(group_configuration)]
+        self.save_course()
+
+    def test_group_configuration_edit(self):
+        """
+        Edit group configuration and check its id and modified fields.
+        """
+        edit_group_configuration = {
+            u'description': u'Edit Test description',
+            u'id': 1,
+            u'name': u'Edit Test name',
+            u'groups': [
+                {u'name': u'Group A'},
+                {u'name': u'Group B'}
+            ]
+        }
+        put_url = reverse_course_url(
+            'group_configurations_detail_handler',
+            self.course.id,
+            kwargs={'group_configuration_id': 1}
+        )
+        response = self.client.put(
+            put_url,
+            data=json.dumps(edit_group_configuration),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        content = json.loads(response.content)
+        self.assertEqual(content['id'], 1)
+        self.assertEqual(content['description'], 'Edit Test description')
+        self.assertEqual(content['name'], 'Edit Test name')
+
+    def test_group_configuration_id_not_exists(self):
+        """
+        Attempt to edit nonexisting group configuration.
+        """
+        # Nonexisting id in cousre here.
+        edit_group_configuration = {
+            u'description': u'Edit Test description',
+            u'id': 200,
+            u'name': u'Edit Test name',
+            u'groups': [
+                {u'name': u'Group A'},
+                {u'name': u'Group B'}
+            ]
+        }
+        put_url = reverse_course_url(
+            'group_configurations_detail_handler',
+            self.course.id,
+            kwargs={'group_configuration_id': 200}
+        )
+        response = self.client.put(
+            put_url,
+            data=json.dumps(edit_group_configuration),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        content = json.loads(response.content)
+
