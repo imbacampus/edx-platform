@@ -1082,7 +1082,7 @@ def group_configurations_list_handler(request, course_key_string):
 
 @login_required
 @ensure_csrf_cookie
-@require_http_methods(("POST", "PUT"))
+@require_http_methods(("GET", "POST", "PUT"))
 def group_configurations_detail_handler(request, course_key_string, group_configuration_id):
     """
     JSON API endpoint for manipulating a group configuration via its internal ID.

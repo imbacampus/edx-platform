@@ -173,17 +173,16 @@ class GroupConfigurationsCreateTestCase(CourseTestCase):
         self.assertEqual(content['id'], 2)
 
 
-class GroupConfigurationsEditTestCase(CourseTestCase):
+class GroupConfigurationsDetailTestCase(CourseTestCase):
     """
-    Test cases for editing group configurations.
+    Test cases for detail handler.
     """
 
     def setUp(self):
         """
         Set up a url and group configuration content for tests.
         """
-        super(GroupConfigurationsEditTestCase, self).setUp()
-        self.post_url = reverse_course_url('group_configurations_list_handler', self.course.id)
+        super(GroupConfigurationsDetailTestCase, self).setUp()
 
         self.group_configuration_json = {
             u'description': u'Test description',
@@ -233,11 +232,44 @@ class GroupConfigurationsEditTestCase(CourseTestCase):
         self.assertEqual(content['description'], 'Edit Test description')
         self.assertEqual(content['name'], 'Edit Test name')
 
-    def test_group_configuration_id_not_exists(self):
+    def test_group_configuration_url_id_not_exists(self):
+        # Group configuration id is not present in course.
+        bad_id = 100
+        url = reverse_course_url(
+            'group_configurations_detail_handler',
+            self.course.id,
+            kwargs={'group_configuration_id': bad_id}
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_group_configuration_url_id_exists(self):
+        # Group configuration id is present in course.
+        good_id = 1
+        url = reverse_course_url(
+            'group_configurations_detail_handler',
+            self.course.id,
+            kwargs={'group_configuration_id': good_id}
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        group_configuration = json.loads(response.content)
+        expected_group_configuration = {
+            u'description': u'Test description',
+            u'id': 1,
+            u'name': u'Test name',
+            u'groups': [
+                {u'id': 0, u'name': u'Group A'},
+                {u'id': 1, u'name': u'Group B'}
+            ]
+        }
+        self.assertEqual(group_configuration, expected_group_configuration)
+
+    def test_group_configuration_json_id_not_exists(self):
         """
         Attempt to edit nonexisting group configuration.
         """
-        # Nonexisting id in cousre here.
+        # Nonexisting id=200 in cousre here in json.
         edit_group_configuration = {
             u'description': u'Edit Test description',
             u'id': 200,
@@ -247,10 +279,11 @@ class GroupConfigurationsEditTestCase(CourseTestCase):
                 {u'name': u'Group B'}
             ]
         }
+        # Group configuration id that present in course.
         put_url = reverse_course_url(
             'group_configurations_detail_handler',
             self.course.id,
-            kwargs={'group_configuration_id': 200}
+            kwargs={'group_configuration_id': 1}
         )
         response = self.client.put(
             put_url,
@@ -260,4 +293,4 @@ class GroupConfigurationsEditTestCase(CourseTestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         content = json.loads(response.content)
-
+        self.assertEqual(content['id'], 1)
