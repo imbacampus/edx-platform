@@ -28,6 +28,66 @@ class GroupConfigurationsCreateTestCase(CourseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn('New Group Configuration', response.content)
 
+    def test_list_page_ajax(self):
+        """
+        Check that the group configuration lists all configurations.
+        """
+        group_configurations = [
+            {
+                u'description': u'Test description',
+                u'id': 1,
+                u'name': u'Test name',
+                u'version': 1,
+                u'groups': [
+                    {u'id': 0, u'name': u'Group A', u'version': 1},
+                    {u'id': 1, u'name': u'Group B', u'version': 1}
+                ]
+            },
+            {
+                u'description': u'Test description 2',
+                u'id': 2,
+                u'name': u'Test name 2',
+                u'version': 1,
+                u'groups': [
+                    {u'id': 0, u'name': u'Group A', u'version': 1},
+                    {u'id': 1, u'name': u'Group B', u'version': 1}
+                ]
+            }
+        ]
+        self.course.user_partitions = [
+            UserPartition.from_json(configuration)
+            for configuration in group_configurations
+        ]
+        self.save_course()
+        response = self.client.get(
+            self.url,
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        group_configurations = json.loads(response.content)
+        expected_group_configurations = [
+            {
+                u'description': u'Test description',
+                u'id': 1,
+                u'name': u'Test name',
+                u'groups': [
+                    {u'id': 0, u'name': u'Group A'},
+                    {u'id': 1, u'name': u'Group B'}
+                ]
+            },
+            {
+                u'description': u'Test description 2',
+                u'id': 2,
+                u'name': u'Test name 2',
+                u'groups': [
+                    {u'id': 0, u'name': u'Group A'},
+                    {u'id': 1, u'name': u'Group B'}
+                ]
+            },
+        ]
+        self.assertItemsEqual(group_configurations, expected_group_configurations)
+
     def test_group_success(self):
         """
         Test that you can create a group configuration.
