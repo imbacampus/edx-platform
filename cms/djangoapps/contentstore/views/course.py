@@ -935,7 +935,7 @@ class GroupConfiguration(object):
         """
         Assign id for the group_configuration.
         """
-        if not group_configuration.get("id"):
+        if not group_configuration.get("id") or cid:
             group_configuration["id"] = cid if cid else unicode(uuid.uuid1())
 
         return group_configuration
