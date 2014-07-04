@@ -354,3 +354,34 @@ class GroupConfigurationsDetailTestCase(CourseTestCase):
         )
         content = json.loads(response.content)
         self.assertEqual(content['id'], 1)
+
+    def test_update_bad_group(self):
+        """
+        Test if only one group in configuration exist on update.
+        """
+        # Only one group in group configuration here.
+        bad_group_configuration = {
+            u'description': u'Test description',
+            u'id': 1,
+            u'name': u'Test name',
+            u'version': 1,
+            u'groups': [
+                {u'id': 0, u'name': u'Group A', u'version': 1},
+            ]
+        }
+        # Group configuration id that present in course.
+        url = reverse_course_url(
+            'group_configurations_detail_handler',
+            self.course.id,
+            kwargs={'group_configuration_id': 1}
+        )
+        response = self.client.post(
+            url,
+            data=json.dumps(bad_group_configuration),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertEqual(response.status_code, 400)
+        content = json.loads(response.content)
+        self.assertIn("error", content)
