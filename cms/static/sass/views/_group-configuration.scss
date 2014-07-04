@@ -334,26 +334,26 @@
           &.add-group-configuration-name label {
             @extend %t-title5;
             display: inline-block;
-            width: 70%;
+            width: 50%;
+            padding-right: 5%;
             overflow: hidden;
             text-overflow: ellipsis;
+            vertical-align: bottom;
           }
 
           .group-configuration-id {
-            @include font-size(18);
+            @include font-size(14);
             @include line-height(18);
             display: inline-block;
-            width: 30%;
+            width: 45%;
             text-align: right;
             vertical-align: top;
             color: $gray-l1;
 
-            .group-configuration-label {
-              margin-right: ($baseline*.75);
-            }
-
             .group-configuration-value {
               font-weight: bold;
+              white-space: nowrap;
+              margin-left: ($baseline*0.5);
             }
           }
         }

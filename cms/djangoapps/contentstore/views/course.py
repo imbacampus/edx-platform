@@ -877,7 +877,7 @@ class GroupConfiguration(object):
         if assign_id:
             used_ids = GroupConfiguration.get_used_ids(course)
             if isinstance(assign_id, basestring):
-                cid = int(assign_id)
+                cid = assign_id
             else:
                 cid = None
             GroupConfiguration.assign_id(group_configuration, used_ids, cid=cid)

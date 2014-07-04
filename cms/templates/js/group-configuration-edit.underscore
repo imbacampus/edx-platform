@@ -9,7 +9,7 @@
             <legend class="sr"><%= gettext("Group Configuration information") %></legend>
             <div class="input-wrap field text required add-group-configuration-name <% if(error && error.attributes && error.attributes.name) { print('error'); } %>">
                 <label for="group-configuration-name-<%= uniqueId %>"><%= gettext("Group Configuration Name") %></label><%
-                if (_.isNumber(id)) {
+                if (!_.isUndefined(id)) {
                     %><span class="group-configuration-id">
                         <span class="group-configuration-label"><%= gettext('Group Configuration ID') %></span>
                         <span class="group-configuration-value"><%= id %></span>
