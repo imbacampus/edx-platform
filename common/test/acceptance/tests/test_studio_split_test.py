@@ -342,7 +342,7 @@ class GroupConfigurationsTest(UniqueCourseTest):
         config = self.page.group_configurations()[0]
         config.name = "New Group Configuration Name"
         config.description = "New Description of the group configuration."
-        self.assertEqual(config.get_text('.action-primary'), "Create")
+        self.assertEqual(config.get_text('.action-primary'), "CREATE")
         # Save the configuration
         config.save()
 
@@ -359,7 +359,7 @@ class GroupConfigurationsTest(UniqueCourseTest):
         self.assertTrue(config.id)
         config.name = "Second Group Configuration Name"
         config.description = "Second Description of the group configuration."
-        self.assertEqual(config.get_text('.action-primary'), "Save")
+        self.assertEqual(config.get_text('.action-primary'), "SAVE")
         # Save the configuration
         config.save()
 
